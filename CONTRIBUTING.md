@@ -14,14 +14,15 @@
 
 2. 然后 Fork 本仓库，将其 Clone 到本地。
 
-3. 在本地进行修改，完成后 Commit。（请尽量一次 Commit 提交全部内容。可以追加 Commits，但尽量不要频繁提交内容较少的 Commits。）
+3. 在本地进行修改，使用 [Prettier](https://prettier.io/) 格式化后 Commit。（请尽量一次 Commit 提交全部内容。可以追加 Commits，但尽量不要频繁提交内容较少的 Commits。）
 
 4. 将修改推送到您的仓库
 
 5. 再[创建一个 Pull Request](https://github.com/win12-online/win12/pulls)。
 
 6. 然后`坐和放宽`，等待其他人对你的代码进行审查。
->[!TIP]
+
+> [!TIP]
 > 在此过程中请尽量使用 Git 命令行、代码编辑器（例如 Visual Studio Code）内置的 Git 功能、Github Desktop、[https://github.dev](https://github.dev/win12-online/win12)等方式进行提交。
 
 ## 重要提醒
@@ -46,12 +47,16 @@
 
 > [!NOTE]
 >
-> 1.  **请不要**任意选取版本号。若您不清楚，可以通过[我们的交流群](https://teams.live.com/l/invite/FEA0yrNkE_bAn-ddwI)与我们取得联系并分配到版本号。
+> 注：在过去很长一段时间里本项目都没有大的更新，因此版本号也一直更新的很慢，您可以不必添加版本号（如确实需要我们会向您说明）
+>
+> 1.  **请不要**任意选取版本号。若您不清楚，可以通过 [我们的交流群](../README.md#交流群) 与我们取得联系并分配到版本号。
 > 2.  在更新时，**记住**要在“关于 Windows 12 网页版”应用的更新记录中，添加关于该更新的相关内容。
 
 - **请善用`Update branch`按钮**。点击`Update branch`按钮可将`main`分支的最新更改合并到当前 PR 中。但请勿频繁操作——会误通知关注者“有新变更”。
 
 - 在开发过程中请一并完善 i18n 的相关属性并将其添加到相关的 properties 文件中，对于如何设置属性和添加新的翻译词条等问题[在翻译贡献指南](https://github.com/win12-online/win12-locales/blob/main/lang/readme.md)中已有相关说明，请自行查阅。
+
+- 若贡献中包含 AI 生成内容，请务必遵循 [AI 辅助工具使用及披露约定](readme/legal/ai-tool-usage-and-disclosure-guidelines.md) 进行声明；原则上，未按要求披露的 PR 可能被拒绝或要求修改。
 
 - 在开发时，请参考 [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines) 中推荐的写作风格撰写文本。另外请注意，我们使用 [autocorrect](https://github.com/huacnlee/autocorrect) 进行自动检查。原则上，未通过检查的 PR 将不会被合并。
 
@@ -65,18 +70,32 @@
 
 1. 对于 HTML 文件的规定
 
-   详见 `desktop.html` 开头的代码规范，务必认真阅读。
+   详见 `desktop.html` 开头的代码规范，务必认真阅读。其中包含：文件布局、
+   脚本加载顺序为何是承重的、CSS 主题变量的使用限制、以及如何运行回归测试。
 
-2. 对 JS 文件的规定
-   1. 请按照以下代码风格进行开发：
+2. 关于代码结构
 
-   ```js
-   var sum = 0;
-   for (var i = 0; i < 10; i++) {
-     sum += i;
-   }
-   console.log(sum);
+   数据与代码已经分离，改动前请先看 `desktop.html` 开头的「文件布局」一节：
+
+   - 应用窗口的 HTML 在 `data/window-templates.js`，由 `scripts/mount-windows.js` 注入
+   - 右键菜单 `cms`、通知 `nts`、弹出面板 `dps` 等注册表在 `data/` 下
+   - 应用逻辑仍在 `module/apps.js`，跨应用复用的实现在 `module/shared.js`
+
+   工程笔记（含各项实测结论与踩过的坑）见 `docs/refactor-notes.md`。
+
+3. 提交前请运行回归测试
+
    ```
+   node tools/regress/run.mjs
+   ```
+
+   它会对比纯净 `main` 与你当前工作树的行为快照（29 个窗口的开关与最大最小化、
+   全部右键菜单与对话框、终端命令、逐元素计算样式、localStorage），
+   并列出所有差异。非预期的差异请在提交前解决。
+
+4. 对 JS 文件的规定
+   1. 请使用 [Prettier](https://prettier.io/) 格式化代码
+      （按照项目根目录下的 `.prettierrc` 配置文件）
 
    2. 对于函数名及变量命名，请使用驼峰式命名法，如：
       - isLoaded
@@ -87,7 +106,3 @@
       - WindowManager
 
       - Widgets
-
-   4. 对于代码规范的规定：
-
-      对于那些不需要展开的代码，尽量压成一行
